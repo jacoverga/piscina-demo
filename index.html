@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piscina Regionale Pré-Saint-Didier | Valle d'Aosta</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+
+    <style>
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0a0a0a; color: #fff; }
+        
+        .nav-pill {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 100px;
+        }
+
+        .hero-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh; z-index: -1;
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('piscina.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+        }
+
+        .bento-card {
+            border-radius: 30px;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .glass-panel, .bento-card { border-radius: 40px; padding: 2.5rem; }
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem;
+        }
+
+        #attivita, #tariffe, #galleria, #contatti { scroll-margin-top: 100px; }
+        @media (min-width: 768px) { #attivita, #tariffe, #galleria, #contatti { scroll-margin-top: 140px; } }
+
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px);
+            justify-content: center;
+            align-items: center;
+        }
+        #lightbox img {
+            max-width: 90%;
+            max-height: 70%;
+            border-radius: 15px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        #lightbox.active img { transform: scale(1); }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .prev-btn { left: 15px; }
+        .next-btn { right: 15px; }
+        @media (min-width: 768px) { .prev-btn { left: 40px; } .next-btn { right: 40px; } }
+        .close-btn { top: 20px; right: 20px; position: absolute; font-size: 35px; cursor: pointer; }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+        @media (min-width: 768px) { .slider-container { height: 550px; border-radius: 40px; } }
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        .slide.active { opacity: 1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="hero-bg"></div>
+
+    <nav class="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-6xl nav-pill px-5 md:px-8 py-3 md:py-4 flex justify-between items-center shadow-2xl">
+        <a href="#" onclick="scrollToTop(event)" class="text-xs md:text-lg font-extrabold tracking-tighter uppercase text-white hover:text-blue-400 transition cursor-pointer">Piscina Regionale</a>
+        
+        <div class="hidden lg:flex gap-8 font-bold text-xs uppercase tracking-widest text-white/80">
+            <a href="#attivita" class="hover:text-blue-400 transition">Attività</a>
+            <a href="#tariffe" class="hover:text-blue-400 transition">Tariffe</a>
+            <a href="#galleria" class="hover:text-blue-400 transition">Galleria</a>
+            <a href="#contatti" class="hover:text-blue-400 transition">Contatti</a>
+        </div>
+        <a href="tel:0165771423" class="bg-blue-600 px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-[10px] md:text-sm hover:bg-blue-500 transition text-white shadow-lg">
+            0165 771423
+        </a>
+    </nav>
+
+    <section id="home" class="h-screen flex flex-col justify-center items-center text-center px-6">
+        <h1 class="text-4xl md:text-8xl font-extrabold tracking-tighter leading-tight mb-4 md:mb-6 max-w-5xl text-white">
+            Piscina Regionale di <br> <span class="text-blue-400 font-black">Prè-Saint-Didier</span>
+        </h1>
+        <p class="text-base md:text-2xl font-light max-w-2xl opacity-90 mb-6 md:mb-8 text-white">
+            Il tuo centro acquatico nel cuore delle Alpi. <br> Nuoto, allenamento e benessere ai piedi del Monte Bianco.
+        </p>
+        <button onclick="scrollToId('#attivita')" class="glass-panel px-8 md:px-10 py-4 md:py-5 font-bold rounded-full hover:bg-white/10 transition uppercase tracking-widest text-xs border-white/30 text-white shadow-2xl">
+            Orari e Corsi
+        </button>
+    </section>
+
+    <main class="px-4 md:px-24 pb-20 md:pb-32 space-y-6 md:space-y-8 max-w-6xl mx-auto">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="attivita">
+            <div class="glass-panel bento-card">
+                <h2 class="text-xl md:text-2xl font-extrabold mb-4 md:mb-6 tracking-tight text-white uppercase">Orari di Apertura</h2>
+                <div class="space-y-1 text-sm md:text-base mb-6 md:mb-8">
+                    <div class="price-row"><span>Lunedì</span><span class="font-bold text-blue-400">15.30 — 21.00</span></div>
+                    <div class="price-row"><span>Martedì</span><span class="font-bold text-blue-400">15.30 — 21.00</span></div>
+                    <div class="price-row"><span>Mercoledì</span><span class="font-bold text-blue-400">12.30 — 20.30</span></div>
+                    <div class="price-row"><span>Giovedì</span><span class="font-bold text-blue-400">15.30 — 21.00</span></div>
+                    <div class="price-row"><span>Venerdì</span><span class="font-bold text-blue-400">12.30 — 20.30</span></div>
+                    <div class="price-row"><span>Sabato</span><span class="font-bold text-blue-400">15.00 — 20.30</span></div>
+                    <div class="price-row border-none"><span>Domenica</span><span class="font-bold text-blue-400">15.00 — 20.30</span></div>
+                </div>
+                <div class="text-[9px] md:text-[11px] uppercase tracking-widest opacity-60 font-bold bg-white/5 py-3 rounded-xl md:rounded-2xl text-center border border-white/10 italic mt-auto">Uscita vasca: 30 min. prima della chiusura</div>
+            </div>
+
+            <div class="glass-panel bento-card">
+                <h2 class="text-xl md:text-2xl font-extrabold mb-4 md:mb-6 tracking-tight text-white uppercase">I Nostri Corsi</h2>
+                <div class="space-y-4 md:space-y-6 mb-6 md:mb-8 flex-grow">
+                    <div><h3 class="text-blue-400 font-bold text-base md:text-lg leading-tight italic">Acquagym</h3><p class="text-xs md:text-sm opacity-80 leading-snug">Adulti e Bambini. Allenamento dinamico per tono e circolazione.</p></div>
+                    <div><h3 class="text-blue-400 font-bold text-base md:text-lg leading-tight italic">Scuola Nuoto</h3><p class="text-xs md:text-sm opacity-80 leading-snug">Adulti e Bambini. Dai primi approcci fino al perfezionamento.</p></div>
+                    <div><h3 class="text-blue-400 font-bold text-base md:text-lg leading-tight italic">Corso Bebè</h3><p class="text-xs md:text-sm opacity-80 leading-snug">Acquaticità neonatale. Gioco e scoperta per i più piccoli.</p></div>
+                </div>
+                <div class="text-[9px] md:text-[11px] uppercase tracking-widest opacity-60 font-bold bg-white/5 py-3 rounded-xl md:rounded-2xl text-center border border-white/10 italic">Contatta la segreteria per iscrizioni</div>
+            </div>
+        </div>
+
+        <div class="glass-panel bento-card w-full" id="tariffe">
+            <h2 class="text-xl md:text-2xl font-extrabold mb-6 md:mb-8 tracking-tight text-white uppercase text-center md:text-left">Listino Prezzi</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-8 md:mb-10 text-left">
+                <div>
+                    <h3 class="text-blue-400 font-bold uppercase text-[9px] tracking-[0.2em] mb-3 border-b border-blue-400/20 pb-2">Adulti</h3>
+                    <div class="space-y-1">
+                        <div class="price-row"><span>Ingresso Singolo</span><span>€ 8,00</span></div>
+                        <div class="price-row"><span>5 Ingressi</span><span>€ 32,00</span></div>
+                        <div class="price-row"><span>15 Ingressi</span><span>€ 80,00</span></div>
+                        <div class="price-row border-none"><span>60 Ingressi</span><span class="font-bold">€ 280,00</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-blue-400 font-bold uppercase text-[9px] tracking-[0.2em] mb-3 border-b border-blue-400/20 pb-2">Bambini / Ridotti</h3>
+                    <div class="space-y-1">
+                        <div class="price-row"><span>Ingresso Singolo</span><span>€ 5,00</span></div>
+                        <div class="price-row"><span>5 Ingressi</span><span>€ 20,00</span></div>
+                        <div class="price-row"><span>15 Ingressi</span><span>€ 50,00</span></div>
+                        <div class="price-row border-none"><span>60 Ingressi</span><span class="font-bold">€ 175,00</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-blue-400 font-bold uppercase text-[9px] tracking-[0.2em] mb-3 border-b border-blue-400/20 pb-2">Benessere</h3>
+                    <div class="space-y-1">
+                        <div class="price-row"><span>Ingresso Singolo</span><span>€ 11,00</span></div>
+                        <div class="price-row"><span>5 Ingressi</span><span>€ 45,00</span></div>
+                        <div class="price-row border-none"><span>15 Ingressi</span><span class="font-bold">€ 114,00</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-blue-400 font-bold uppercase text-[9px] tracking-[0.2em] mb-3 border-b border-blue-400/20 pb-2">Piscina + Benessere</h3>
+                    <div class="space-y-1">
+                        <div class="price-row text-white"><span>Singolo</span><span>€ 16,00</span></div>
+                        <div class="price-row text-white"><span>5 Ingressi</span><span>€ 62,00</span></div>
+                        <div class="price-row border-none text-white"><span>15 Ingressi</span><span>€ 158,00</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-[9px] md:text-[11px] uppercase tracking-widest opacity-60 font-bold bg-white/5 py-3 rounded-xl md:rounded-2xl text-center border border-white/10 italic">Tariffe valide per la stagione in corso</div>
+        </div>
+
+        <section id="galleria" class="pt-4">
+            <h2 class="text-xl md:text-2xl font-extrabold mb-6 md:mb-8 tracking-tight text-white uppercase text-center md:text-left">Galleria</h2>
+            <div class="slider-container glass-panel shadow-2xl border-white/10">
+                <div class="slide active cursor-zoom-in"><img src="foto_1.jpg" class="w-full h-full object-cover" alt="Galleria 1"></div>
+                <div class="slide cursor-zoom-in"><img src="foto_2.jpg" class="w-full h-full object-cover" alt="Galleria 2"></div>
+                <div class="slide cursor-zoom-in"><img src="foto_3.jpg" class="w-full h-full object-cover" alt="Galleria 3"></div>
+                <div class="slide cursor-zoom-in"><img src="foto_4.jpg" class="w-full h-full object-cover" alt="Galleria 4"></div>
+                <div class="slide cursor-zoom-in"><img src="foto_5.jpg" class="w-full h-full object-cover" alt="Galleria 5"></div>
+                <div class="slide cursor-zoom-in"><img src="foto_6.jpg" class="w-full h-full object-cover" alt="Galleria 6"></div>
+                <div class="slide cursor-zoom-in"><img src="foto_7.jpg" class="w-full h-full object-cover" alt="Galleria 7"></div>
+            </div>
+        </section>
+
+        <div id="lightbox">
+            <div class="close-btn" onclick="closeLightbox()">&times;</div>
+            <div class="lightbox-nav prev-btn" onclick="prevImg()">&#10094;</div>
+            <img id="lightbox-img" src="" alt="Fullscreen">
+            <div class="lightbox-nav next-btn" onclick="nextImg()">&#10095;</div>
+        </div>
+
+        <footer id="contatti" class="glass-panel bento-card w-full">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 items-center text-center">
+                <div class="flex flex-col space-y-2">
+                    <p class="text-[9px] md:text-[10px] uppercase opacity-40 tracking-[0.2em] font-bold">Segreteria</p>
+                    <p class="text-xl md:text-2xl font-black text-white hover:text-blue-400 transition cursor-pointer">0165 771423</p>
+                </div>
+                <div class="flex flex-col space-y-2 md:border-x border-white/10 px-2">
+                    <p class="text-[9px] md:text-[10px] uppercase opacity-40 tracking-[0.2em] font-bold">Email</p>
+                    <p class="text-base md:text-lg font-black text-white uppercase tracking-tight">info@piscinapre.it</p>
+                </div>
+                <div class="flex flex-col space-y-1">
+                    <p class="text-[9px] md:text-[10px] uppercase opacity-40 tracking-[0.2em] font-bold">Indirizzo</p>
+                    <p class="text-sm md:text-base font-bold text-white uppercase tracking-tighter italic font-black">Viale Monte Bianco 13</p>
+                    <p class="text-[9px] md:text-[10px] uppercase opacity-40 tracking-widest">11010 Pré-Saint-Didier (AO)</p>
+                </div>
+            </div>
+        </footer>
+
+        <div class="text-center opacity-20 text-[8px] md:text-[9px] uppercase tracking-[0.4em] py-8 font-bold">Piscina Regionale Pré-Saint-Didier — Valle d'Aosta</div>
+    </main>
+
+    <script>
+        const lenis = new Lenis({ duration: 1.2 });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        // Scroll alla Home
+        function scrollToTop(e) {
+            e.preventDefault();
+            lenis.scrollTo(0);
+        }
+
+        function scrollToId(id) { lenis.scrollTo(id, { offset: window.innerWidth < 768 ? -100 : -140 }); }
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) { 
+                if(this.getAttribute('onclick')) return; // Evita conflitti con scrollToTop
+                e.preventDefault(); 
+                scrollToId(this.getAttribute('href')); 
+            });
+        });
+
+        const slides = document.querySelectorAll('.slide');
+        let currentIdx = 0;
+        let slideInterval = setInterval(rotateSlide, 4500);
+        function rotateSlide() {
+            slides[currentIdx].classList.remove('active');
+            currentIdx = (currentIdx + 1) % slides.length;
+            slides[currentIdx].classList.add('active');
+        }
+
+        const lb = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightbox-img');
+        let lbIdx = 0;
+        const images = ["foto_1.jpg", "foto_2.jpg", "foto_3.jpg", "foto_4.jpg", "foto_5.jpg", "foto_6.jpg", "foto_7.jpg"];
+        slides.forEach((s, idx) => { s.addEventListener('click', () => { lbIdx = currentIdx; openLightbox(); }); });
+        function openLightbox() { lbImg.src = images[lbIdx]; lb.style.display = 'flex'; setTimeout(() => lb.classList.add('active'), 10); lenis.stop(); clearInterval(slideInterval); }
+        function closeLightbox() { lb.classList.remove('active'); setTimeout(() => lb.style.display = 'none', 300); lenis.start(); slideInterval = setInterval(rotateSlide, 4500); }
+        function nextImg() { lbIdx = (lbIdx + 1) % images.length; lbImg.src = images[lbIdx]; }
+        function prevImg() { lbIdx = (lbIdx - 1 + images.length) % images.length; lbImg.src = images[lbIdx]; }
+
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from(".bento-card", { scrollTrigger: { trigger: ".bento-card", start: "top 95%" }, y: 30, opacity: 0, stagger: 0.1, duration: 1, ease: "expo.out" });
+    </script>
+</body>
+</html>
